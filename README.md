@@ -1,2 +1,2 @@
 # supreme-pancake
-Unsupervised domanin adaptation using domain level alignment
+Unsupervised domain adaptation using domain level alignment
