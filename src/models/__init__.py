@@ -1,1 +1,1 @@
-from .baseline import Baseline
+from .baseline import DANN as Baseline

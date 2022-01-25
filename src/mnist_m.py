@@ -61,8 +61,6 @@ class MNISTM(VisionDataset):
         else:
             data_file = self.test_file
 
-        print(os.path.join(self.processed_folder, data_file))
-
         self.data, self.targets = torch.load(os.path.join(self.processed_folder, data_file))
 
     def __getitem__(self, index):

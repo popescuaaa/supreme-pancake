@@ -3,8 +3,9 @@
 """
 
 import torch.nn as nn
-form torch import Tensor
-from functions import ReverseLayerF
+from torch import Tensor
+from models.functions import ReverseLayerF
+import torch
 
 class DANN(nn.Module):
     def __init__(self):
@@ -42,8 +43,8 @@ class DANN(nn.Module):
             nn.LogSoftmax(dim=1)
         )
 
-     def forward(self, x: Tensor, alpha: float):
-        x = x.expand(input_data.data.shape[0], 3, 28, 28)
+    def forward(self, x: Tensor, alpha: float):
+        x = x.expand(x.data.shape[0], 3, 28, 28)
         feature = self.feature_extractor(x)
         feature = feature.view(-1, 50 * 4 * 4)
         reverse_feature = ReverseLayerF.apply(feature, alpha)
@@ -51,3 +52,14 @@ class DANN(nn.Module):
         domain_output = self.domain_classifier(reverse_feature)
 
         return class_output, domain_output
+
+    @property
+    def device(self):
+        return next(self.parameters()).device
+
+if __name__ == "__main__":
+    dann = DANN()
+    x = torch.rand((28, 28))
+    c, d = dann(x=x, alpha=0.12)
+    assert c.shape == torch.Size([28, 10]), "The model failed to produce correct shape for output"
+    assert d.shape == torch.Size([28, 2]), "The model failed to produce correct shape for output"
