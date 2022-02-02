@@ -1,5 +1,5 @@
 from models.baseline import DANN as Baseline
-from models.image_utils import transform_source, transform_target
+from models.image_utils import transform_source, transform_target, create_grid_plot
 
 # Data
 from torchvision.datasets import MNIST
@@ -13,12 +13,19 @@ import torch
 import numpy as np
 import os
 
+# Logging 
+
+import wandb
 
 # Fixed random seed
 torch.random.manual_seed(42)
 
 class BaselineTrainer:
     def __init__(self, cfg: Dict or None):
+        # Init wandb
+        run_name = 'DANN - MnistM -> MNIST'
+        wandb.init(config=cfg, project='_unsupervised_domain_adaptation_', name=run_name)
+
         self.cfg = cfg
 
         # Setup environment for training
@@ -121,6 +128,11 @@ class BaselineTrainer:
 
                 counter += 1
 
+            
+            wandb.log({'Erorr label [ source ]': err_source_label.cpu().data.numpy()}, step=epoch)
+            wandb.log({'Error domain [ source ]':  err_source_domain.cpu().data.numpy()}, step=epoch)
+            wandb.log({'Error domain [ target ]': err_target_domain.cpu().data.numpy()}, step=epoch)
+
             print('epoch: %d, [iter: %d / all %d], err_source_label: %f, err_source_domain: %f, err_target_domain: %f' \
                 % (epoch, counter, min_iter_limit, err_source_label.cpu().data.numpy(),
                     err_source_domain.cpu().data.numpy(), err_target_domain.cpu().data.numpy()))
@@ -166,8 +178,15 @@ class BaselineTrainer:
             n_correct += pred.eq(target_label.data.view_as(pred)).cpu().sum()
             n_total += batch_size
 
+            grid = create_grid_plot(target_data[:16], pred[:16])
+
+            wandb.log({'Results': grid}, step=i)
+            wandb.log({'Accuracy [ target ]': n_correct.data.numpy() * 1.0 / n_total}, step=i)
+            
             i += 1
+
 
         accu = n_correct.data.numpy() * 1.0 / n_total
 
+        wandb.log({'Accuracy [ target ]': accu}, step=epoch)
         print ('accuracy of the %s dataset: %f' % ("mnist_m", accu))
