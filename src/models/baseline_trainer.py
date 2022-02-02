@@ -180,8 +180,8 @@ class BaselineTrainer:
 
             grid = create_grid_plot(target_data[:16], pred[:16])
 
-            wandb.log({'Results': grid}, step=i)
-            wandb.log({'Accuracy [ target ]': n_correct.data.numpy() * 1.0 / n_total}, step=i)
+            wandb.log({'Results': grid}, step=i + self.num_epochs)
+            wandb.log({'Accuracy [ target ]': n_correct.data.numpy() * 1.0 / n_total}, step=i + self.num_epochs)
             
             i += 1
 
