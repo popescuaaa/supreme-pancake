@@ -1,41 +1,35 @@
 """
  
- Baseline implementation, adapted for meta alignment: https://arxiv.org/pdf/2103.13575.pdf
+ Baseline implementation (DANN), adapted for meta alignment: https://arxiv.org/pdf/2103.13575.pdf
 
 """
 
 
 import torch.nn as nn
 from utils.torch_funcs import grl_hook
-
-__all__ = ['Discriminator']
-
+from torch import Tensor
 
 class Discriminator(nn.Module):
     def __init__(self, in_feature: int, hidden_size: int, out_feature: int = 1):
         super(Discriminator, self).__init__()
-        self.ad_layer1 = nn.Linear(in_feature, hidden_size)
-        self.ad_layer2 = nn.Linear(hidden_size, hidden_size)
-        self.ad_layer3 = nn.Linear(hidden_size, out_feature)
-        self.relu1 = nn.ReLU()
-        self.relu2 = nn.ReLU()
-        self.dropout1 = nn.Dropout(0.5)
-        self.dropout2 = nn.Dropout(0.5)
-        self.dropout3 = nn.Dropout(0.5)
+        self.net = nn.Sequential(
+            nn.Linear(in_feature, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+
+            nn.Linear(hidden_size, out_feature)
+        )
 
         self._init_params()
 
-    def forward(self, x, coeff: float):
+    def forward(self, x: Tensor, coeff: float):
         x = x * 1.  # to avoid affect the grad from another pipeline to x_0
         x.register_hook(grl_hook(coeff))
-        x = self.ad_layer1.forward(x)
-        x = self.relu1(x)
-        x = self.dropout1(x)
-        x = self.ad_layer2(x)
-        x = self.relu2(x)
-        x = self.dropout2(x)
-        y = self.ad_layer3(x)
-
+        y = self.net(x)
         return y
 
     def _init_params(self):
