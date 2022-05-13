@@ -5,3 +5,4 @@
 
 from .office_home import OfficeHome
 from .domainnet import DomainNet
+from .visada2017 import VisDA17

@@ -45,6 +45,8 @@ class BaseTrainer:
             dataset = OfficeHome
         elif self.cfg.DATASET.NAME == 'domainnet':
             dataset = DomainNet
+        elif self.cfg.DATASET.NAME == 'visda':
+            dataset = Visda2017
         else:
             raise ValueError(f'Dataset {self.cfg.DATASET.NAME} not found')
 
@@ -118,17 +120,17 @@ class BaseTrainer:
         self.lr_scheduler = inv_lr_scheduler
 
     def resume_from_ckpt(self):
-        last_ckpt = os.path.join(self.cfg.TRAIN.OUTPUT_CKPT, 'models-last.pt')
-        if os.path.exists(last_ckpt):
-            ckpt = torch.load(last_ckpt)
-            for k, v in self.registed_models.items():
-                v.load_state_dict(ckpt[k])
-            self.optimizer.load_state_dict(ckpt['optimizer'])
-            self.start_ite = ckpt['ite']
-            self.best_acc = ckpt['best_acc']
-            logging.info(f'> loading ckpt from {last_ckpt} | ite: {self.start_ite} | best_acc: {self.best_acc:.3f}')
-        else:
-            logging.info('--> training from scratch')
+        # last_ckpt = os.path.join(self.cfg.TRAIN.OUTPUT_CKPT, 'models-last.pt')
+        # if os.path.exists(last_ckpt):
+        #     ckpt = torch.load(last_ckpt)
+        #     for k, v in self.registed_models.items():
+        #         v.load_state_dict(ckpt[k])
+        #     self.optimizer.load_state_dict(ckpt['optimizer'])
+        #     self.start_ite = ckpt['ite']
+        #     self.best_acc = ckpt['best_acc']
+        #     logging.info(f'> loading ckpt from {last_ckpt} | ite: {self.start_ite} | best_acc: {self.best_acc:.3f}')
+        # else:
+        logging.info('--> training from scratch')
 
     def train(self):
         # start training

@@ -107,6 +107,10 @@ def get_default_and_update_cfg(args):
             'c': 'clipart',
             'r': 'real_world'
         },
+        'visda': {
+            'a': 'aeroplane',
+            'c': 'car',
+        },
         'domainnet': {
             'c': 'clipart',
             'i': 'infograph',
