@@ -131,4 +131,4 @@ dmypy.json
 
 # Datsets
 ./data/
-./wandb/
+./wandb/./data
